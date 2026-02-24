@@ -1,0 +1,31 @@
+[package]
+name = "composite-llm"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+
+[features]
+default = ["backend-openai"]
+backend-openai = ["async-openai/chat-completion"]
+backend-azure = ["async-openai/chat-completion"]
+backend-bedrock = ["dep:aws-sdk-bedrockruntime", "dep:aws-config", "dep:aws-smithy-types"]
+backend-vertex = ["dep:reqwest", "dep:gcp_auth", "dep:bytes"]
+
+[dependencies]
+async-openai = { version = "0.33", default-features = false, features = ["chat-completion-types"] }
+async-trait = "0.1"
+tokio = { version = "1", features = ["rt"] }
+tokio-stream = "0.1"
+futures-core = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+uuid = { version = "1", features = ["v4"] }
+
+aws-sdk-bedrockruntime = { version = "1", optional = true }
+aws-config = { version = "1", features = ["behavior-version-latest"], optional = true }
+aws-smithy-types = { version = "1", optional = true }
+
+reqwest = { version = "0.12", features = ["json", "stream"], optional = true }
+gcp_auth = { version = "0.12", optional = true }
+bytes = { version = "1", optional = true }
