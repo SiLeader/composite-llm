@@ -29,3 +29,26 @@ aws-smithy-types = { version = "1", optional = true }
 reqwest = { version = "0.12", features = ["json", "stream"], optional = true }
 gcp_auth = { version = "0.12", optional = true }
 bytes = { version = "1", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+[[example]]
+name = "openai"
+required-features = ["backend-openai"]
+
+[[example]]
+name = "azure"
+required-features = ["backend-azure"]
+
+[[example]]
+name = "bedrock"
+required-features = ["backend-bedrock"]
+
+[[example]]
+name = "vertex"
+required-features = ["backend-vertex"]
+
+[[example]]
+name = "streaming"
+required-features = ["backend-openai"]
