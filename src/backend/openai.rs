@@ -6,17 +6,25 @@ use super::{ChatCompletionBackend, ChatCompletionStream};
 use crate::error::CompositeLlmError;
 use async_openai::types::chat::{CreateChatCompletionRequest, CreateChatCompletionResponse};
 
+/// A backend implementation for OpenAI.
+///
+/// This backend uses the `async-openai` crate to communicate with the OpenAI API.
 pub struct OpenAIBackend {
     client: Client<OpenAIConfig>,
 }
 
 impl OpenAIBackend {
+    /// Creates a new `OpenAIBackend` with the given configuration.
     pub fn new(config: OpenAIConfig) -> Self {
         Self {
             client: Client::with_config(config),
         }
     }
 
+    /// Creates a new `OpenAIBackend` from environment variables.
+    ///
+    /// This uses `async_openai::Client::new()` which reads `OPENAI_API_KEY` and other
+    /// environment variables.
     pub fn from_env() -> Self {
         Self {
             client: Client::new(),

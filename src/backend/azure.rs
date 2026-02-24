@@ -6,11 +6,15 @@ use super::{ChatCompletionBackend, ChatCompletionStream};
 use crate::error::CompositeLlmError;
 use async_openai::types::chat::{CreateChatCompletionRequest, CreateChatCompletionResponse};
 
+/// A backend implementation for Azure OpenAI.
+///
+/// This backend uses the `async-openai` crate with `AzureConfig`.
 pub struct AzureBackend {
     client: Client<AzureConfig>,
 }
 
 impl AzureBackend {
+    /// Creates a new `AzureBackend` with the given configuration.
     pub fn new(config: AzureConfig) -> Self {
         Self {
             client: Client::with_config(config),

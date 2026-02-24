@@ -12,12 +12,16 @@ use async_openai::types::chat::{
     CreateChatCompletionRequest, CreateChatCompletionResponse, CreateChatCompletionStreamResponse,
 };
 
+/// A backend implementation for Amazon Bedrock.
+///
+/// This backend uses the AWS SDK for Bedrock Runtime (Converse API).
 pub struct BedrockBackend {
     client: BedrockClient,
     model_id: String,
 }
 
 impl BedrockBackend {
+    /// Creates a new `BedrockBackend` with an existing client and model ID.
     pub fn new(client: BedrockClient, model_id: impl Into<String>) -> Self {
         Self {
             client,
@@ -25,6 +29,10 @@ impl BedrockBackend {
         }
     }
 
+    /// Creates a new `BedrockBackend` from the environment.
+    ///
+    /// This loads the AWS configuration from the environment (credentials, region)
+    /// and creates a default `BedrockClient`.
     pub async fn from_env(model_id: impl Into<String>) -> Self {
         let config = aws_config::load_defaults(aws_config::BehaviorVersion::latest()).await;
         Self {

@@ -18,14 +18,24 @@ pub use backend::openai::OpenAIBackend;
 #[cfg(feature = "backend-vertex")]
 pub use backend::vertex::VertexBackend;
 
+/// A unified client for multiple LLM backends.
+///
+/// This enum wraps the specific backend implementation (OpenAI, Azure, Bedrock, Vertex)
+/// and delegates method calls to the active backend.
+///
+/// Use feature flags to enable specific backends.
 pub enum CompositeClient {
     #[cfg(feature = "backend-openai")]
+    /// The OpenAI backend.
     OpenAI(OpenAIBackend),
     #[cfg(feature = "backend-azure")]
+    /// The Azure OpenAI backend.
     Azure(AzureBackend),
     #[cfg(feature = "backend-bedrock")]
+    /// The Amazon Bedrock backend.
     Bedrock(BedrockBackend),
     #[cfg(feature = "backend-vertex")]
+    /// The Google Vertex AI backend.
     Vertex(VertexBackend),
 }
 
@@ -52,6 +62,15 @@ macro_rules! dispatch {
 }
 
 impl CompositeClient {
+    /// Sends a chat completion request to the configured backend.
+    ///
+    /// # Arguments
+    ///
+    /// * `req` - A `CreateChatCompletionRequest` containing the model, messages, and other parameters.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<CreateChatCompletionResponse, CompositeLlmError>` - The response from the backend or an error.
     pub async fn chat_completion(
         &self,
         req: CreateChatCompletionRequest,
@@ -59,6 +78,15 @@ impl CompositeClient {
         dispatch!(self, chat_completion, req)
     }
 
+    /// Sends a streaming chat completion request to the configured backend.
+    ///
+    /// # Arguments
+    ///
+    /// * `req` - A `CreateChatCompletionRequest` containing the model, messages, and other parameters.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<ChatCompletionStream, CompositeLlmError>` - A stream of response chunks or an error.
     pub async fn chat_completion_stream(
         &self,
         req: CreateChatCompletionRequest,

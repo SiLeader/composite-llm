@@ -18,6 +18,10 @@ use async_openai::types::chat::{
     CreateChatCompletionRequest, CreateChatCompletionResponse, CreateChatCompletionStreamResponse,
 };
 
+/// A backend implementation for Google Vertex AI.
+///
+/// This backend uses direct HTTP requests to the Vertex AI API, handling authentication
+/// via `gcp_auth`.
 pub struct VertexBackend {
     client: Client,
     auth: Arc<dyn TokenProvider>,
@@ -27,6 +31,13 @@ pub struct VertexBackend {
 }
 
 impl VertexBackend {
+    /// Creates a new `VertexBackend`.
+    ///
+    /// # Arguments
+    ///
+    /// * `project_id` - The Google Cloud project ID.
+    /// * `location` - The region (e.g., "us-central1").
+    /// * `model_id` - The model ID (e.g., "gemini-pro").
     pub async fn new(
         project_id: impl Into<String>,
         location: impl Into<String>,
