@@ -1,8 +1,7 @@
 use std::pin::Pin;
 
 use async_openai::types::chat::{
-    CreateChatCompletionRequest, CreateChatCompletionResponse,
-    CreateChatCompletionStreamResponse,
+    CreateChatCompletionRequest, CreateChatCompletionResponse, CreateChatCompletionStreamResponse,
 };
 use async_trait::async_trait;
 use futures_core::Stream;
@@ -22,10 +21,7 @@ pub mod bedrock;
 pub mod vertex;
 
 pub type ChatCompletionStream = Pin<
-    Box<
-        dyn Stream<Item = Result<CreateChatCompletionStreamResponse, CompositeLlmError>>
-            + Send,
-    >,
+    Box<dyn Stream<Item = Result<CreateChatCompletionStreamResponse, CompositeLlmError>> + Send>,
 >;
 
 #[async_trait]

@@ -1,12 +1,10 @@
-use async_openai::{config::AzureConfig, Client};
+use async_openai::{Client, config::AzureConfig};
 use async_trait::async_trait;
 use tokio_stream::StreamExt;
 
 use super::{ChatCompletionBackend, ChatCompletionStream};
 use crate::error::CompositeLlmError;
-use async_openai::types::chat::{
-    CreateChatCompletionRequest, CreateChatCompletionResponse,
-};
+use async_openai::types::chat::{CreateChatCompletionRequest, CreateChatCompletionResponse};
 
 pub struct AzureBackend {
     client: Client<AzureConfig>,

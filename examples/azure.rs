@@ -1,7 +1,6 @@
 use async_openai::config::AzureConfig;
 use async_openai::types::chat::{
-    ChatCompletionRequestMessage, ChatCompletionRequestUserMessageArgs,
-    CreateChatCompletionRequest,
+    ChatCompletionRequestMessage, ChatCompletionRequestUserMessageArgs, CreateChatCompletionRequest,
 };
 use composite_llm::{AzureBackend, ChatCompletionBackend};
 
@@ -12,8 +11,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_api_key(std::env::var("AZURE_OPENAI_API_KEY")?)
         .with_deployment_id(std::env::var("AZURE_OPENAI_DEPLOYMENT_ID")?)
         .with_api_version(
-            std::env::var("AZURE_OPENAI_API_VERSION")
-                .unwrap_or_else(|_| "2024-02-01".to_string()),
+            std::env::var("AZURE_OPENAI_API_VERSION").unwrap_or_else(|_| "2024-02-01".to_string()),
         );
 
     let backend = AzureBackend::new(config);

@@ -9,8 +9,7 @@ use crate::convert::bedrock::{
 use crate::convert::generate_chat_cmpl_id;
 use crate::error::CompositeLlmError;
 use async_openai::types::chat::{
-    CreateChatCompletionRequest, CreateChatCompletionResponse,
-    CreateChatCompletionStreamResponse,
+    CreateChatCompletionRequest, CreateChatCompletionResponse, CreateChatCompletionStreamResponse,
 };
 
 pub struct BedrockBackend {
@@ -112,9 +111,10 @@ impl ChatCompletionBackend for BedrockBackend {
                 match output.stream.recv().await {
                     Ok(Some(event)) => {
                         if let Some(resp) = stream_event_to_response(&event, &model, &id)
-                            && tx.send(Ok(resp)).await.is_err() {
-                                break;
-                            }
+                            && tx.send(Ok(resp)).await.is_err()
+                        {
+                            break;
+                        }
                     }
                     Ok(None) => break,
                     Err(e) => {

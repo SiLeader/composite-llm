@@ -1,18 +1,17 @@
+use async_openai::types::chat::FunctionCall;
 use async_openai::types::chat::{
-    ChatChoice, ChatChoiceStream, ChatCompletionMessageToolCall,
-    ChatCompletionMessageToolCalls, ChatCompletionRequestMessage,
-    ChatCompletionResponseMessage, ChatCompletionStreamResponseDelta,
-    CompletionUsage, CreateChatCompletionRequest, CreateChatCompletionResponse,
-    CreateChatCompletionStreamResponse, FinishReason, Role, StopConfiguration,
-    ChatCompletionRequestSystemMessageContent, ChatCompletionRequestSystemMessageContentPart,
-    ChatCompletionRequestDeveloperMessageContent, ChatCompletionRequestDeveloperMessageContentPart,
-    ChatCompletionRequestUserMessageContent, ChatCompletionRequestUserMessageContentPart,
+    ChatChoice, ChatChoiceStream, ChatCompletionMessageToolCall, ChatCompletionMessageToolCalls,
     ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestAssistantMessageContentPart,
-    ChatCompletionRequestToolMessageContent, ChatCompletionRequestToolMessageContentPart,
-    ChatCompletionTools, ChatCompletionToolChoiceOption, ResponseFormat,
+    ChatCompletionRequestDeveloperMessageContent, ChatCompletionRequestDeveloperMessageContentPart,
+    ChatCompletionRequestMessage, ChatCompletionRequestSystemMessageContent,
+    ChatCompletionRequestSystemMessageContentPart, ChatCompletionRequestToolMessageContent,
+    ChatCompletionRequestToolMessageContentPart, ChatCompletionRequestUserMessageContent,
+    ChatCompletionRequestUserMessageContentPart, ChatCompletionResponseMessage,
+    ChatCompletionStreamResponseDelta, ChatCompletionToolChoiceOption, ChatCompletionTools,
+    CompletionUsage, CreateChatCompletionRequest, CreateChatCompletionResponse,
+    CreateChatCompletionStreamResponse, FinishReason, ResponseFormat, Role, StopConfiguration,
     ToolChoiceOptions,
 };
-use async_openai::types::chat::FunctionCall;
 use serde::{Deserialize, Serialize};
 
 use crate::error::CompositeLlmError;
@@ -144,7 +143,9 @@ pub fn convert_request(
                     ChatCompletionRequestSystemMessageContent::Text(t) => t.clone(),
                     ChatCompletionRequestSystemMessageContent::Array(parts) => parts
                         .iter()
-                        .map(|ChatCompletionRequestSystemMessageContentPart::Text(t)| t.text.clone())
+                        .map(|ChatCompletionRequestSystemMessageContentPart::Text(t)| {
+                            t.text.clone()
+                        })
                         .collect::<Vec<_>>()
                         .join("\n"),
                 };
@@ -159,7 +160,11 @@ pub fn convert_request(
                     ChatCompletionRequestDeveloperMessageContent::Text(t) => t.clone(),
                     ChatCompletionRequestDeveloperMessageContent::Array(parts) => parts
                         .iter()
-                        .map(|ChatCompletionRequestDeveloperMessageContentPart::Text(t)| t.text.clone())
+                        .map(
+                            |ChatCompletionRequestDeveloperMessageContentPart::Text(t)| {
+                                t.text.clone()
+                            },
+                        )
                         .collect::<Vec<_>>()
                         .join("\n"),
                 };
@@ -433,9 +438,7 @@ pub fn convert_vertex_response(
     })
 }
 
-fn extract_parts(
-    candidate: &VertexCandidate,
-) -> (String, Vec<ChatCompletionMessageToolCalls>) {
+fn extract_parts(candidate: &VertexCandidate) -> (String, Vec<ChatCompletionMessageToolCalls>) {
     let mut text = String::new();
     let mut tool_calls = Vec::new();
 
@@ -532,9 +535,10 @@ pub fn parse_sse_events(buffer: &[u8]) -> (Vec<VertexResponse>, Vec<u8>) {
     for line in complete_text.lines() {
         let trimmed = line.trim();
         if let Some(json_str) = trimmed.strip_prefix("data: ")
-            && let Ok(resp) = serde_json::from_str::<VertexResponse>(json_str) {
-                responses.push(resp);
-            }
+            && let Ok(resp) = serde_json::from_str::<VertexResponse>(json_str)
+        {
+            responses.push(resp);
+        }
     }
 
     let remaining = if remaining_text.trim().is_empty() {
@@ -603,10 +607,7 @@ mod tests {
 
         let result = convert_vertex_response(&resp, "gemini-pro").unwrap();
         assert_eq!(result.choices.len(), 1);
-        assert_eq!(
-            result.choices[0].message.content.as_deref(),
-            Some("Hello!")
-        );
+        assert_eq!(result.choices[0].message.content.as_deref(), Some("Hello!"));
         assert_eq!(result.choices[0].finish_reason, Some(FinishReason::Stop));
         let usage = result.usage.unwrap();
         assert_eq!(usage.prompt_tokens, 10);

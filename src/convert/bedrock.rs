@@ -1,22 +1,20 @@
-use async_openai::types::chat::{
-    ChatChoice, ChatChoiceStream, ChatCompletionMessageToolCall,
-    ChatCompletionMessageToolCalls, ChatCompletionRequestMessage,
-    ChatCompletionResponseMessage, ChatCompletionStreamResponseDelta,
-    CompletionUsage, CreateChatCompletionRequest, CreateChatCompletionResponse,
-    CreateChatCompletionStreamResponse, FinishReason, Role, StopConfiguration,
-    ChatCompletionRequestSystemMessageContent, ChatCompletionRequestSystemMessageContentPart,
-    ChatCompletionRequestDeveloperMessageContent, ChatCompletionRequestDeveloperMessageContentPart,
-    ChatCompletionRequestUserMessageContent, ChatCompletionRequestUserMessageContentPart,
-    ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestAssistantMessageContentPart,
-    ChatCompletionRequestToolMessageContent, ChatCompletionRequestToolMessageContentPart,
-    ChatCompletionTools,
-};
 use async_openai::types::chat::FunctionCall;
+use async_openai::types::chat::{
+    ChatChoice, ChatChoiceStream, ChatCompletionMessageToolCall, ChatCompletionMessageToolCalls,
+    ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestAssistantMessageContentPart,
+    ChatCompletionRequestDeveloperMessageContent, ChatCompletionRequestDeveloperMessageContentPart,
+    ChatCompletionRequestMessage, ChatCompletionRequestSystemMessageContent,
+    ChatCompletionRequestSystemMessageContentPart, ChatCompletionRequestToolMessageContent,
+    ChatCompletionRequestToolMessageContentPart, ChatCompletionRequestUserMessageContent,
+    ChatCompletionRequestUserMessageContentPart, ChatCompletionResponseMessage,
+    ChatCompletionStreamResponseDelta, ChatCompletionTools, CompletionUsage,
+    CreateChatCompletionRequest, CreateChatCompletionResponse, CreateChatCompletionStreamResponse,
+    FinishReason, Role, StopConfiguration,
+};
 use aws_sdk_bedrockruntime::types::{
     ContentBlock, ContentBlockDelta, ConversationRole, ConverseStreamOutput,
-    InferenceConfiguration, Message, StopReason, SystemContentBlock, Tool,
-    ToolConfiguration, ToolInputSchema, ToolResultBlock, ToolResultContentBlock,
-    ToolSpecification, ToolUseBlock,
+    InferenceConfiguration, Message, StopReason, SystemContentBlock, Tool, ToolConfiguration,
+    ToolInputSchema, ToolResultBlock, ToolResultContentBlock, ToolSpecification, ToolUseBlock,
 };
 
 use crate::error::CompositeLlmError;
@@ -41,11 +39,11 @@ fn json_to_document(value: serde_json::Value) -> aws_smithy_types::Document {
         serde_json::Value::Array(arr) => {
             aws_smithy_types::Document::Array(arr.into_iter().map(json_to_document).collect())
         }
-        serde_json::Value::Object(map) => {
-            aws_smithy_types::Document::Object(
-                map.into_iter().map(|(k, v)| (k, json_to_document(v))).collect(),
-            )
-        }
+        serde_json::Value::Object(map) => aws_smithy_types::Document::Object(
+            map.into_iter()
+                .map(|(k, v)| (k, json_to_document(v)))
+                .collect(),
+        ),
     }
 }
 
@@ -63,11 +61,11 @@ fn document_to_json(doc: &aws_smithy_types::Document) -> serde_json::Value {
         aws_smithy_types::Document::Array(arr) => {
             serde_json::Value::Array(arr.iter().map(document_to_json).collect())
         }
-        aws_smithy_types::Document::Object(map) => {
-            serde_json::Value::Object(
-                map.iter().map(|(k, v)| (k.clone(), document_to_json(v))).collect(),
-            )
-        }
+        aws_smithy_types::Document::Object(map) => serde_json::Value::Object(
+            map.iter()
+                .map(|(k, v)| (k.clone(), document_to_json(v)))
+                .collect(),
+        ),
     }
 }
 
@@ -82,42 +80,36 @@ pub fn extract_system_and_messages(
             ChatCompletionRequestMessage::System(s) => {
                 let text = match s.content {
                     ChatCompletionRequestSystemMessageContent::Text(t) => t,
-                    ChatCompletionRequestSystemMessageContent::Array(parts) => {
-                        parts
-                            .into_iter()
-                            .map(|ChatCompletionRequestSystemMessageContentPart::Text(t)| t.text)
-                            .collect::<Vec<_>>()
-                            .join("\n")
-                    }
+                    ChatCompletionRequestSystemMessageContent::Array(parts) => parts
+                        .into_iter()
+                        .map(|ChatCompletionRequestSystemMessageContentPart::Text(t)| t.text)
+                        .collect::<Vec<_>>()
+                        .join("\n"),
                 };
                 system_blocks.push(SystemContentBlock::Text(text));
             }
             ChatCompletionRequestMessage::Developer(d) => {
                 let text = match d.content {
                     ChatCompletionRequestDeveloperMessageContent::Text(t) => t,
-                    ChatCompletionRequestDeveloperMessageContent::Array(parts) => {
-                        parts
-                            .into_iter()
-                            .map(|ChatCompletionRequestDeveloperMessageContentPart::Text(t)| t.text)
-                            .collect::<Vec<_>>()
-                            .join("\n")
-                    }
+                    ChatCompletionRequestDeveloperMessageContent::Array(parts) => parts
+                        .into_iter()
+                        .map(|ChatCompletionRequestDeveloperMessageContentPart::Text(t)| t.text)
+                        .collect::<Vec<_>>()
+                        .join("\n"),
                 };
                 system_blocks.push(SystemContentBlock::Text(text));
             }
             ChatCompletionRequestMessage::User(u) => {
                 let text = match u.content {
                     ChatCompletionRequestUserMessageContent::Text(t) => t,
-                    ChatCompletionRequestUserMessageContent::Array(parts) => {
-                        parts
-                            .into_iter()
-                            .filter_map(|p| match p {
-                                ChatCompletionRequestUserMessageContentPart::Text(t) => Some(t.text),
-                                _ => None,
-                            })
-                            .collect::<Vec<_>>()
-                            .join("\n")
-                    }
+                    ChatCompletionRequestUserMessageContent::Array(parts) => parts
+                        .into_iter()
+                        .filter_map(|p| match p {
+                            ChatCompletionRequestUserMessageContentPart::Text(t) => Some(t.text),
+                            _ => None,
+                        })
+                        .collect::<Vec<_>>()
+                        .join("\n"),
                 };
                 bedrock_messages.push(
                     Message::builder()
@@ -132,16 +124,16 @@ pub fn extract_system_and_messages(
                 if let Some(content) = a.content {
                     let text = match content {
                         ChatCompletionRequestAssistantMessageContent::Text(t) => t,
-                        ChatCompletionRequestAssistantMessageContent::Array(parts) => {
-                            parts
-                                .into_iter()
-                                .filter_map(|p| match p {
-                                    ChatCompletionRequestAssistantMessageContentPart::Text(t) => Some(t.text),
-                                    _ => None,
-                                })
-                                .collect::<Vec<_>>()
-                                .join("\n")
-                        }
+                        ChatCompletionRequestAssistantMessageContent::Array(parts) => parts
+                            .into_iter()
+                            .filter_map(|p| match p {
+                                ChatCompletionRequestAssistantMessageContentPart::Text(t) => {
+                                    Some(t.text)
+                                }
+                                _ => None,
+                            })
+                            .collect::<Vec<_>>()
+                            .join("\n"),
                     };
                     if !text.is_empty() {
                         contents.push(ContentBlock::Text(text));
@@ -179,13 +171,11 @@ pub fn extract_system_and_messages(
             ChatCompletionRequestMessage::Tool(t) => {
                 let text = match t.content {
                     ChatCompletionRequestToolMessageContent::Text(text) => text,
-                    ChatCompletionRequestToolMessageContent::Array(parts) => {
-                        parts
-                            .into_iter()
-                            .map(|ChatCompletionRequestToolMessageContentPart::Text(t)| t.text)
-                            .collect::<Vec<_>>()
-                            .join("\n")
-                    }
+                    ChatCompletionRequestToolMessageContent::Array(parts) => parts
+                        .into_iter()
+                        .map(|ChatCompletionRequestToolMessageContentPart::Text(t)| t.text)
+                        .collect::<Vec<_>>()
+                        .join("\n"),
                 };
                 let result = ToolResultBlock::builder()
                     .tool_use_id(&t.tool_call_id)
@@ -207,9 +197,7 @@ pub fn extract_system_and_messages(
     Ok((system_blocks, bedrock_messages))
 }
 
-pub fn build_inference_config(
-    req: &CreateChatCompletionRequest,
-) -> Option<InferenceConfiguration> {
+pub fn build_inference_config(req: &CreateChatCompletionRequest) -> Option<InferenceConfiguration> {
     let has_params = req.temperature.is_some()
         || req.top_p.is_some()
         || req.max_completion_tokens.is_some()

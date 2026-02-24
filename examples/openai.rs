@@ -1,6 +1,5 @@
 use async_openai::types::chat::{
-    ChatCompletionRequestMessage, ChatCompletionRequestUserMessageArgs,
-    CreateChatCompletionRequest,
+    ChatCompletionRequestMessage, ChatCompletionRequestUserMessageArgs, CreateChatCompletionRequest,
 };
 use composite_llm::{ChatCompletionBackend, OpenAIBackend};
 

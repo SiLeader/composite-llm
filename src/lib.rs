@@ -3,19 +3,18 @@ pub mod convert;
 pub mod error;
 
 pub use async_openai::types::chat::{
-    CreateChatCompletionRequest, CreateChatCompletionResponse,
-    CreateChatCompletionStreamResponse,
+    CreateChatCompletionRequest, CreateChatCompletionResponse, CreateChatCompletionStreamResponse,
 };
 pub use backend::ChatCompletionBackend;
 pub use backend::ChatCompletionStream;
 pub use error::CompositeLlmError;
 
-#[cfg(feature = "backend-openai")]
-pub use backend::openai::OpenAIBackend;
 #[cfg(feature = "backend-azure")]
 pub use backend::azure::AzureBackend;
 #[cfg(feature = "backend-bedrock")]
 pub use backend::bedrock::BedrockBackend;
+#[cfg(feature = "backend-openai")]
+pub use backend::openai::OpenAIBackend;
 #[cfg(feature = "backend-vertex")]
 pub use backend::vertex::VertexBackend;
 

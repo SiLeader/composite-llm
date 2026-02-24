@@ -8,15 +8,14 @@ use gcp_auth::TokenProvider;
 use reqwest::Client;
 
 use super::{ChatCompletionBackend, ChatCompletionStream};
-use crate::convert::vertex::{
-    convert_request, convert_vertex_response, convert_vertex_stream_chunk, parse_sse_events,
-    VertexResponse,
-};
 use crate::convert::generate_chat_cmpl_id;
+use crate::convert::vertex::{
+    VertexResponse, convert_request, convert_vertex_response, convert_vertex_stream_chunk,
+    parse_sse_events,
+};
 use crate::error::CompositeLlmError;
 use async_openai::types::chat::{
-    CreateChatCompletionRequest, CreateChatCompletionResponse,
-    CreateChatCompletionStreamResponse,
+    CreateChatCompletionRequest, CreateChatCompletionResponse, CreateChatCompletionStreamResponse,
 };
 
 pub struct VertexBackend {
@@ -181,9 +180,7 @@ impl Stream for SseStream {
                 this.buffer = remaining;
 
                 for resp in responses {
-                    if let Some(chunk) =
-                        convert_vertex_stream_chunk(&resp, &this.model, &this.id)
-                    {
+                    if let Some(chunk) = convert_vertex_stream_chunk(&resp, &this.model, &this.id) {
                         this.pending.push(chunk);
                     }
                 }

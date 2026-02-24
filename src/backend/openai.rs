@@ -1,12 +1,10 @@
-use async_openai::{config::OpenAIConfig, Client};
+use async_openai::{Client, config::OpenAIConfig};
 use async_trait::async_trait;
 use tokio_stream::StreamExt;
 
 use super::{ChatCompletionBackend, ChatCompletionStream};
 use crate::error::CompositeLlmError;
-use async_openai::types::chat::{
-    CreateChatCompletionRequest, CreateChatCompletionResponse,
-};
+use async_openai::types::chat::{CreateChatCompletionRequest, CreateChatCompletionResponse};
 
 pub struct OpenAIBackend {
     client: Client<OpenAIConfig>,
