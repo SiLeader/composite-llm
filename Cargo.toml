@@ -26,7 +26,7 @@ aws-sdk-bedrockruntime = { version = "1", optional = true }
 aws-config = { version = "1", features = ["behavior-version-latest"], optional = true }
 aws-smithy-types = { version = "1", optional = true }
 
-reqwest = { version = "0.12", features = ["json", "stream"], optional = true }
+reqwest = { version = "0.13", features = ["json", "stream"], optional = true }
 gcp_auth = { version = "0.12", optional = true }
 bytes = { version = "1", optional = true }
 
