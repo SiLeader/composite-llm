@@ -12,7 +12,7 @@ backend-bedrock = ["dep:aws-sdk-bedrockruntime", "dep:aws-config", "dep:aws-smit
 backend-vertex = ["dep:reqwest", "dep:gcp_auth", "dep:bytes"]
 
 [dependencies]
-async-openai = { version = "0.33", default-features = false, features = ["chat-completion-types"] }
+async-openai = { version = "0.35", default-features = false, features = ["chat-completion-types"] }
 async-trait = "0.1"
 tokio = { version = "1", features = ["rt"] }
 tokio-stream = "0.1"
