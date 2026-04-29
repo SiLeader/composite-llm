@@ -2,34 +2,32 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [master]
   pull_request:
-    branches: [main, master]
-
-env:
-  CARGO_TERM_COLOR: always
+    branches: [master]
 
 jobs:
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rustfmt
+      - name: Checkout codes
+        uses: actions/checkout@v6
+
+      - name: Run cargo fmt
+        shell: bash
       - run: cargo fmt --all --check
 
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
-      - uses: Swatinem/rust-cache@v2
-      - run: cargo clippy --all-features -- -D warnings
+      - name: Checkout codes
+        uses: actions/checkout@v6
+
+      - name: Run cargo clippy
+        shell: bash
+        run: cargo clippy --all-features -- -D warnings
 
   test:
     name: Test
@@ -44,9 +42,9 @@ jobs:
           - "backend-vertex"
           - "all"
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Checkout codes
+        uses: actions/checkout@v6
+
       - name: Run tests
         run: |
           if [ "${{ matrix.features }}" = "all" ]; then
@@ -56,3 +54,4 @@ jobs:
           else
             cargo test --no-default-features --features "${{ matrix.features }}"
           fi
+
