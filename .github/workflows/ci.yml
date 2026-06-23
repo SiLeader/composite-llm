@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout codes
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Run cargo fmt
         shell: bash
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout codes
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Run cargo clippy
         shell: bash
@@ -43,7 +43,7 @@ jobs:
           - "all"
     steps:
       - name: Checkout codes
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Run tests
         run: |
